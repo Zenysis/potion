@@ -53,11 +53,6 @@ class Route(object):
 
     Routes are not bound to a specific resource and their schema, generated using :meth:`schema_factory` can vary depending on the resource.
 
-    If ``view_func`` has an ``__annotations__`` attribute (a Python 3.x function annotation), the annotations
-    will be used to generate the ``request_schema`` and ``response_schema``. The *return* annotation in this case
-    is expected to be a :class:`schema.Schema` used for responses, and all other annotations are expected to be of type :class:`fields.Raw`
-    and are combined into a :class:`schema.Fieldset`.
-
     .. attribute:: relation
 
         A relation for the string, equal to ``rel`` if one was given.
@@ -136,14 +131,8 @@ class Route(object):
         self.view_func = view_func
         self.format_response = format_response
 
-        annotations = getattr(view_func, '__annotations__', None)
-
-        if isinstance(annotations, dict) and len(annotations):
-            self.request_schema = FieldSet({name: field for name, field in annotations.items() if name != 'return'})
-            self.response_schema = annotations.get('return', response_schema)
-        else:
-            self.request_schema = schema
-            self.response_schema = response_schema
+        self.request_schema = schema
+        self.response_schema = response_schema
 
         self._related_routes = ()
 
